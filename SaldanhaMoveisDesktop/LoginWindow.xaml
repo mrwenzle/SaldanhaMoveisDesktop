@@ -1,0 +1,53 @@
+﻿<Window x:Class="SaldanhaMoveisDesktop.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Login - Saldanha Móveis" Height="480" Width="350"
+        Background="#0a0a0a" WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize" WindowStyle="None" Icon="logo.ico">
+
+    <!-- Borda mais suave e elegante -->
+    <Border BorderBrush="#D4AF37" BorderThickness="1" CornerRadius="10" Margin="5">
+        <Grid Margin="30,20,30,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- 0: Logo -->
+                <RowDefinition Height="Auto"/>
+                <!-- 1: Título -->
+                <RowDefinition Height="Auto"/>
+                <!-- 2: Subtítulo -->
+                <RowDefinition Height="Auto"/>
+                <!-- 3: Espaço extra -->
+                <RowDefinition Height="Auto"/>
+                <!-- 4: Label Usuário -->
+                <RowDefinition Height="Auto"/>
+                <!-- 5: Input Usuário -->
+                <RowDefinition Height="Auto"/>
+                <!-- 6: Label Senha -->
+                <RowDefinition Height="Auto"/>
+                <!-- 7: Input Senha -->
+                <RowDefinition Height="*"/>
+                <!-- 8: Botões -->
+            </Grid.RowDefinitions>
+
+            <!-- Logo (Ajustado para ler a sua imagem jpeg) -->
+            <Image Grid.Row="0" Source="logo.jpeg" Width="90" Height="90" Stretch="Uniform" Margin="0,0,0,10"/>
+
+            <TextBlock Grid.Row="1" Text="SALDANHA MÓVEIS" Foreground="#D4AF37" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Row="2" Text="Acesso Restrito" Foreground="#888888" FontSize="13" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+
+            <!-- Campo Usuário -->
+            <TextBlock Grid.Row="4" Text="Usuário:" Foreground="#ccc" FontSize="13" Margin="0,0,0,5"/>
+            <TextBox x:Name="inputUsuario" Grid.Row="5" Padding="10" Background="#1a1a1a" Foreground="White" BorderBrush="#333" Margin="0,0,0,20"/>
+
+            <!-- Campo Senha -->
+            <TextBlock Grid.Row="6" Text="Senha:" Foreground="#ccc" FontSize="13" Margin="0,0,0,5"/>
+            <PasswordBox x:Name="inputSenha" Grid.Row="7" Padding="10" Background="#1a1a1a" Foreground="White" BorderBrush="#333" Margin="0,0,0,30"/>
+
+            <!-- Botões empurrados para o final do Grid -->
+            <StackPanel Grid.Row="8" Orientation="Vertical" VerticalAlignment="Bottom">
+                <Button Content="ENTRAR" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" FontSize="14" Padding="12" BorderThickness="0" Cursor="Hand" Click="ClicouEntrar"/>
+                <Button Content="Sair do Sistema" Background="Transparent" Foreground="#666" BorderThickness="0" Cursor="Hand" Margin="0,15,0,0" Click="ClicouSair"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

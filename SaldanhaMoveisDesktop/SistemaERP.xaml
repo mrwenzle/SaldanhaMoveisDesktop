@@ -1,0 +1,282 @@
+﻿<Window x:Class="SaldanhaMoveisDesktop.SistemaERP"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Saldanha Móveis - ERP Completo" Height="760" Width="1100"
+        Background="#0a0a0a" WindowStartupLocation="CenterScreen"
+        Icon="logo.ico">
+
+    <Window.Resources>
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" Padding="15,10" Margin="0,0,5,0" Background="#1a1a1a" CornerRadius="8,8,0,0">
+                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="10,2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#D4AF37"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="Foreground" Value="#aaaaaa"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20" Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="SALDANHA MÓVEIS" Foreground="#D4AF37" FontSize="36" FontWeight="Bold"/>
+                <TextBlock Text="ONDE O SUCESSO ACONTECE" Foreground="#888888" FontSize="14"/>
+            </StackPanel>
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <!-- ABA 1: FLUXO DE CAIXA -->
+            <TabItem Header="Fluxo de Caixa">
+                <Grid Margin="0,15,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Total de Entradas" Foreground="#aaaaaa" FontSize="14"/>
+                                <TextBlock x:Name="txtEntradas" Text="R$ 0,00" Foreground="#4caf50" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="5,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="Total de Saídas" Foreground="#aaaaaa" FontSize="14"/>
+                                <TextBlock x:Name="txtSaidas" Text="R$ 0,00" Foreground="#f44336" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="10,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Saldo do Período" Foreground="#aaaaaa" FontSize="14"/>
+                                <TextBlock x:Name="txtSaldo" Text="R$ 0,00" Foreground="#D4AF37" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#1a1a1a" CornerRadius="8" Padding="15" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="Novo Lançamento no Caixa" Foreground="#D4AF37" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2.5*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="O que foi vendido/comprado?" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="inputDescricao" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Text="Valor (R$):" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="inputValor" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                    <TextBlock Text="Tipo:" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="comboTipo" Padding="8" Background="#eee" Foreground="Black">
+                                        <ComboBoxItem Content="Entrada" IsSelected="True"/>
+                                        <ComboBoxItem Content="Saída"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                                    <TextBlock Text="Categoria:" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <ComboBox x:Name="comboCategoria" IsEditable="True" Padding="8" Background="#eee" Foreground="Black">
+                                        <ComboBoxItem Content="Vendas" IsSelected="True"/>
+                                        <ComboBoxItem Content="Material/Estoque"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
+                                    <Button x:Name="btnRegistrar" Content="Registrar Transação" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Padding="10" BorderThickness="0" Cursor="Hand" Click="ClicouRegistrarCaixa"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="Histórico de Registros" Foreground="#D4AF37" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="Visualizar registros por:" Foreground="#aaa" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <ComboBox x:Name="comboFiltro" Width="140" Padding="5" SelectionChanged="MudouFiltroCaixa">
+                                    <ComboBoxItem Content="Mês Atual" IsSelected="True"/>
+                                    <ComboBoxItem Content="Esta Semana"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </DockPanel>
+                        <DataGrid x:Name="gridHistorico" Grid.Row="1" AutoGenerateColumns="False" Background="#1a1a1a" RowBackground="#222" AlternatingRowBackground="#1a1a1a" Foreground="White" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333" BorderThickness="0" IsReadOnly="True">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#D4AF37"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Padding" Value="8"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat=dd/MM/yyyy HH:mm}" Width="1.5*"/>
+                                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="3*"/>
+                                <DataGridTextColumn Header="Categoria" Binding="{Binding Categoria}" Width="2*"/>
+                                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="1.5*"/>
+                                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat=C}" Width="2*"/>
+                                <DataGridTemplateColumn Header="Ações" Width="1*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarCaixa"/>
+                                                <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirCaixa"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- ABA 2: FUNCIONÁRIOS -->
+            <TabItem Header="Pagamento de Funcionários">
+                <Grid Margin="0,15,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Total Pago (Folha)" Foreground="#aaaaaa" FontSize="14"/>
+                                <TextBlock x:Name="txtTotalFolha" Text="R$ 0,00" Foreground="#f44336" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="10,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Qtd. Funcionários Pagos" Foreground="#aaaaaa" FontSize="14"/>
+                                <TextBlock x:Name="txtQtdPagos" Text="0" Foreground="#D4AF37" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#1a1a1a" CornerRadius="8" Padding="15" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="Registrar Pagamento" Foreground="#D4AF37" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="Nome do Funcionário:" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="inputNomeFunc" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Text="Cargo/Função:" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="inputCargo" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                    <TextBlock Text="Valor Pago (R$):" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="inputValorFunc" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                                    <TextBlock Text="Mês Referência (Ex: Jan/26):" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="inputMesRef" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
+                                    <Button x:Name="btnRegistrarFunc" Content="Salvar Pagamento" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Padding="10" BorderThickness="0" Cursor="Hand" Click="ClicouRegistrarFuncionario"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Histórico de Pagamentos" Foreground="#D4AF37" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <DataGrid x:Name="gridFuncionarios" Grid.Row="1" AutoGenerateColumns="False" Background="#1a1a1a" RowBackground="#222" AlternatingRowBackground="#1a1a1a" Foreground="White" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333" BorderThickness="0" IsReadOnly="True">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#D4AF37"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Padding" Value="8"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Data Pgto" Binding="{Binding Data, StringFormat=dd/MM/yyyy}" Width="1.5*"/>
+                                <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="2.5*"/>
+                                <DataGridTextColumn Header="Cargo" Binding="{Binding Cargo}" Width="2*"/>
+                                <DataGridTextColumn Header="Mês Ref." Binding="{Binding MesReferencia}" Width="1.5*"/>
+                                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat=C}" Width="1.5*"/>
+
+                                <!-- A COLUNA DE AÇÕES QUE FALTAVA NA ABA DE FUNCIONÁRIOS -->
+                                <DataGridTemplateColumn Header="Ações" Width="1*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarFuncionario"/>
+                                                <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirFuncionario"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Ações" Width="1*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarFuncionario"/>
+                                            <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirFuncionario"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
