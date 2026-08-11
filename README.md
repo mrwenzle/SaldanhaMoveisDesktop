@@ -33,17 +33,3 @@ Este projeto foi desenvolvido com uma fundação sólida, visando escalabilidade
 - [ ] **Fase 2:** Planejamento e modelagem da migração dos dados locais (*Custom Objects*).
 - [ ] **Fase 3:** Reconstrução da regra de negócios e interface visual como um aplicativo nativo **Salesforce Lightning**.
 
-## ⚙️ Como Executar o Projeto
-1. Certifique-se de ter o [Visual Studio](https://visualstudio.microsoft.com/) instalado com a carga de trabalho de "Desenvolvimento para Desktop com .NET".
-2. Clone este repositório:
-   ```bash
-   git clone [https://github.com/SEU-USUARIO/SaldanhaMoveisDesktop.git](https://github.com/SEU-USUARIO/SaldanhaMoveisDesktop.git)
-Abra o arquivo SaldanhaMoveisDesktop.sln no Visual Studio.
-
-O gerenciador de pacotes NuGet restaurará o ClosedXML automaticamente.
-
-Pressione F5 para compilar e iniciar o sistema.
-
-Credenciais de Teste: admin / 1234
-
-Desenvolvido com dedicação e foco em engenharia de software.
