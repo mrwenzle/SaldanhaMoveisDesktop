@@ -38,3 +38,12 @@ Este projeto foi desenvolvido com uma fundação sólida, visando escalabilidade
 2. Clone este repositório:
    ```bash
    git clone [https://github.com/SEU-USUARIO/SaldanhaMoveisDesktop.git](https://github.com/SEU-USUARIO/SaldanhaMoveisDesktop.git)
+Abra o arquivo SaldanhaMoveisDesktop.sln no Visual Studio.
+
+O gerenciador de pacotes NuGet restaurará o ClosedXML automaticamente.
+
+Pressione F5 para compilar e iniciar o sistema.
+
+Credenciais de Teste: admin / 1234
+
+Desenvolvido com dedicação e foco em engenharia de software.
