@@ -37,4 +37,4 @@ O projeto evoluiu de uma persistência de dados baseada em planilhas para uma es
 
 1. Clone este repositório:
    ```bash
-   git clone [https://github.com/SEU-USUARIO/SaldanhaMoveisDesktop.git](https://github.com/SEU-USUARIO/SaldanhaMoveisDesktop.git)
+   git clone [https://github.com/mrwenzle/SaldanhaMoveisDesktop.git](https://github.com/mrwenzle/SaldanhaMoveisDesktop.git)
