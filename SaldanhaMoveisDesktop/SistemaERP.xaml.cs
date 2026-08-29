@@ -456,5 +456,10 @@ namespace SaldanhaMoveisDesktop
                 MessageBox.Show($"Erro: {ex.Message}");
             }
         }
+
+        private void gridCarrinho_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

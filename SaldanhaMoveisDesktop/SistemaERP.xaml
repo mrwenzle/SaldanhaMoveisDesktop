@@ -476,7 +476,7 @@
                     </Grid>
 
                     <!-- CARRINHO DE COMPRAS -->
-                    <DataGrid x:Name="gridCarrinho" Grid.Row="2" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+                    <DataGrid x:Name="gridCarrinho" Grid.Row="2" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" SelectionChanged="gridCarrinho_SelectionChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Produto" Binding="{Binding Produto.Nome}" Width="2*"/>
                             <DataGridTextColumn Header="Qtd" Binding="{Binding Quantidade}" Width="1*"/>
