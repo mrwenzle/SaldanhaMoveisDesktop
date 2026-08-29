@@ -9,7 +9,7 @@ namespace SaldanhaMoveisDesktop
         {
             InitializeComponent();
 
-            // Coloca o foco automático no campo de usuário ao abrir a tela
+           
             inputUsuario.Focus();
         }
 

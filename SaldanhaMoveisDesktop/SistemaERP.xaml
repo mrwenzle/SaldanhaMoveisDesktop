@@ -1,6 +1,7 @@
 ﻿<Window x:Class="SaldanhaMoveisDesktop.SistemaERP"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         Title="Saldanha Móveis - ERP Completo" Height="760" Width="1100"
         Background="#0a0a0a" WindowStartupLocation="CenterScreen"
         Icon="logo.ico">
@@ -43,125 +44,102 @@
         </StackPanel>
 
         <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
-            <!-- ABA 1: FLUXO DE CAIXA -->
-            <TabItem Header="Fluxo de Caixa">
-                <Grid Margin="0,15,0,0">
+
+            <!-- ABA 1: DASHBOARD GERENCIAL (COM GRÁFICOS)  -->
+            <TabItem Header="📊 Dashboard">
+                <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <!-- 0: Cabeçalho com Título e Botão -->
                         <RowDefinition Height="Auto"/>
+                        <!-- 1: Cards Superiores -->
                         <RowDefinition Height="*"/>
+                        <!-- 2: Gráficos -->
                     </Grid.RowDefinitions>
 
+                    <!-- CABEÇALHO -->
                     <Grid Grid.Row="0" Margin="0,0,0,20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="0,0,10,0">
+                        <TextBlock Grid.Column="0" Text="Visão Geral do Negócio" Foreground="#D4AF37" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"/>
+
+                        <!-- O Novo Botão de Relatório -->
+                        <Button Grid.Column="1" Content="📄 VER MOVIMENTAÇÕES DETALHADAS" Background="#333" Foreground="White" Cursor="Hand" Padding="15,10" BorderThickness="0" Click="ClicouVerMovimentacoes"/>
+                    </Grid>
+
+                    <!-- CARDS DE MÉTRICAS (Mantidos e idênticos ao anterior) -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="#1a1a1a" BorderBrush="#333" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                             <StackPanel>
-                                <TextBlock Text="Total de Entradas" Foreground="#aaaaaa" FontSize="14"/>
-                                <TextBlock x:Name="txtEntradas" Text="R$ 0,00" Foreground="#4caf50" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                                <TextBlock Text="💰 Faturamento (Mês)" Foreground="#ccc" FontSize="14" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="txtFaturamentoMes" Text="R$ 0,00" Foreground="#28a745" FontSize="26" FontWeight="Bold" Margin="0,10,0,0"/>
                             </StackPanel>
                         </Border>
-                        <Border Grid.Column="1" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="5,0,5,0">
+
+                        <Border Grid.Column="1" Background="#1a1a1a" BorderBrush="#333" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                             <StackPanel>
-                                <TextBlock Text="Total de Saídas" Foreground="#aaaaaa" FontSize="14"/>
-                                <TextBlock x:Name="txtSaidas" Text="R$ 0,00" Foreground="#f44336" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                                <TextBlock Text="📉 Despesas (Mês)" Foreground="#ccc" FontSize="14" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="txtDespesasMes" Text="R$ 0,00" Foreground="#dc3545" FontSize="26" FontWeight="Bold" Margin="0,10,0,0"/>
                             </StackPanel>
                         </Border>
-                        <Border Grid.Column="2" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="5,0,0,0" CornerRadius="8" Padding="15" Margin="10,0,0,0">
+
+                        <Border Grid.Column="2" Background="#1a1a1a" BorderBrush="#D4AF37" BorderThickness="2" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                             <StackPanel>
-                                <TextBlock Text="Saldo do Período" Foreground="#aaaaaa" FontSize="14"/>
-                                <TextBlock x:Name="txtSaldo" Text="R$ 0,00" Foreground="#D4AF37" FontSize="26" FontWeight="Bold" Margin="0,5,0,0"/>
+                                <TextBlock Text="💎 Lucro Líquido" Foreground="#D4AF37" FontSize="14" FontWeight="Bold"/>
+                                <TextBlock x:Name="txtLucroMes" Text="R$ 0,00" Foreground="White" FontSize="26" FontWeight="Bold" Margin="0,10,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="3" Background="#1a1a1a" BorderBrush="#333" BorderThickness="1" CornerRadius="8" Padding="15">
+                            <StackPanel>
+                                <TextBlock Text="🛒 Vendas Hoje" Foreground="#ccc" FontSize="14" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="txtVendasHoje" Text="0" Foreground="#17a2b8" FontSize="26" FontWeight="Bold" Margin="0,10,0,0"/>
                             </StackPanel>
                         </Border>
                     </Grid>
 
-                    <Border Grid.Row="1" Background="#1a1a1a" CornerRadius="8" Padding="15" Margin="0,0,0,20">
-                        <StackPanel>
-                            <TextBlock Text="Novo Lançamento no Caixa" Foreground="#D4AF37" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    <!-- ÁREA DOS GRÁFICOS -->
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <!-- Gráfico de Barras (Maior) -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- Gráfico de Pizza (Menor) -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Gráfico 1: Desempenho da Semana -->
+                        <Border Grid.Column="0" Background="#1a1a1a" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2.5*"/>
-                                    <ColumnDefinition Width="1.5*"/>
-                                    <ColumnDefinition Width="1.5*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="2*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                    <TextBlock Text="O que foi vendido/comprado?" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
-                                    <TextBox x:Name="inputDescricao" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                                    <TextBlock Text="Valor (R$):" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
-                                    <TextBox x:Name="inputValor" Padding="8" Background="#222" Foreground="White" BorderBrush="#444"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Margin="0,0,10,0">
-                                    <TextBlock Text="Tipo:" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
-                                    <ComboBox x:Name="comboTipo" Padding="8" Background="#eee" Foreground="Black">
-                                        <ComboBoxItem Content="Entrada" IsSelected="True"/>
-                                        <ComboBoxItem Content="Saída"/>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Grid.Column="3" Margin="0,0,10,0">
-                                    <TextBlock Text="Categoria:" Foreground="#ccc" FontSize="11" Margin="0,0,0,4"/>
-                                    <ComboBox x:Name="comboCategoria" IsEditable="True" Padding="8" Background="#eee" Foreground="Black">
-                                        <ComboBoxItem Content="Vendas" IsSelected="True"/>
-                                        <ComboBoxItem Content="Material/Estoque"/>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
-                                    <Button x:Name="btnRegistrar" Content="Registrar Transação" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Padding="10" BorderThickness="0" Cursor="Hand" Click="ClicouRegistrarCaixa"/>
-                                </StackPanel>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="Faturamento dos Últimos 7 Dias" Foreground="#ccc" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15"/>
+                                <lvc:CartesianChart x:Name="graficoSemana" Grid.Row="1" DisableAnimations="True"/>
                             </Grid>
-                        </StackPanel>
-                    </Border>
+                        </Border>
 
-                    <Grid Grid.Row="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                            <TextBlock Text="Histórico de Registros" Foreground="#D4AF37" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <TextBlock Text="Visualizar registros por:" Foreground="#aaa" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <ComboBox x:Name="comboFiltro" Width="140" Padding="5" SelectionChanged="MudouFiltroCaixa">
-                                    <ComboBoxItem Content="Mês Atual" IsSelected="True"/>
-                                    <ComboBoxItem Content="Esta Semana"/>
-                                </ComboBox>
-                            </StackPanel>
-                        </DockPanel>
-                        <DataGrid x:Name="gridHistorico" Grid.Row="1" AutoGenerateColumns="False" Background="#1a1a1a" RowBackground="#222" AlternatingRowBackground="#1a1a1a" Foreground="White" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333" BorderThickness="0" IsReadOnly="True">
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#D4AF37"/>
-                                    <Setter Property="Foreground" Value="Black"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="Padding" Value="8"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat=dd/MM/yyyy HH:mm}" Width="1.5*"/>
-                                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="3*"/>
-                                <DataGridTextColumn Header="Categoria" Binding="{Binding Categoria}" Width="2*"/>
-                                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="1.5*"/>
-                                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat=C}" Width="2*"/>
-                                <DataGridTemplateColumn Header="Ações" Width="1*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarCaixa"/>
-                                                <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirCaixa"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <!-- Gráfico 2: Receitas vs Despesas -->
+                        <Border Grid.Column="1" Background="#1a1a1a" CornerRadius="8" Padding="15">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="Balanço Mensal" Foreground="#ccc" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15"/>
+                                <lvc:PieChart x:Name="graficoMes" Grid.Row="1" LegendLocation="Bottom" InnerRadius="40"/>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -274,6 +252,260 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <!-- COLE A ABA DE CLIENTES EXATAMENTE AQUI -->
+            <TabItem Header="👥 Clientes">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- 0: Título -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 1: Formulário (Grid) -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 2: Botões de Ação -->
+                        <RowDefinition Height="*"/>
+                        <!-- 3: Tabela de Clientes -->
+                    </Grid.RowDefinitions>
+
+                    <!-- TÍTULO -->
+                    <TextBlock Grid.Row="0" Text="Gestão de Clientes" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                    <!-- FORMULÁRIO -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <!-- Nome -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- CPF/CNPJ -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- Telefone -->
+                            <ColumnDefinition Width="2*"/>
+                            <!-- Endereço -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Nome -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="Nome Completo:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputNomeCliente" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+
+                        <!-- CPF/CNPJ -->
+                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                            <TextBlock Text="CPF/CNPJ:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputCpfCliente" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+
+                        <!-- Telefone -->
+                        <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                            <TextBlock Text="Telefone:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputTelefoneCliente" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+
+                        <!-- Endereço -->
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Endereço:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputEnderecoCliente" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- BOTÕES -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,20">
+                        <Button Content="LIMPAR" Background="Transparent" Foreground="#888" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Padding="15,8" Click="ClicouLimparCliente"/>
+                        <Button Content="SALVAR CLIENTE" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Cursor="Hand" Padding="20,8" BorderThickness="0" Click="ClicouSalvarCliente"/>
+                    </StackPanel>
+
+                    <!-- TABELA DE CLIENTES (DataGrid) -->
+                    <DataGrid x:Name="gridClientes" Grid.Row="3" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nome" Binding="{Binding Nome}" Width="2*"/>
+                            <DataGridTextColumn Header="CPF/CNPJ" Binding="{Binding CpfCnpj}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Telefone" Binding="{Binding Telefone}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Endereço" Binding="{Binding Endereco}" Width="2*"/>
+
+                            <!-- Ações (Editar/Excluir) -->
+                            <DataGridTemplateColumn Header="Ações" Width="1*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarCliente"/>
+                                            <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirCliente"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <!-- ========================================== -->
+            <!-- ABA 4: PRODUTOS (ESTOQUE)                  -->
+            <!-- ========================================== -->
+            <TabItem Header="📦 Produtos">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- 0: Título -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 1: Formulário -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 2: Botões -->
+                        <RowDefinition Height="*"/>
+                        <!-- 3: Tabela -->
+                    </Grid.RowDefinitions>
+
+                    <!-- TÍTULO -->
+                    <TextBlock Grid.Row="0" Text="Controle de Estoque" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                    <!-- FORMULÁRIO -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <!-- Nome -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- Preço Custo -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- Preço Venda -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- Quantidade -->
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Nome do Produto -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="Nome do Produto:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputNomeProduto" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+
+                        <!-- Preço de Custo -->
+                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                            <TextBlock Text="Preço de Custo (R$):" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputPrecoCusto" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+
+                        <!-- Preço de Venda -->
+                        <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                            <TextBlock Text="Preço de Venda (R$):" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputPrecoVenda" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+
+                        <!-- Quantidade em Estoque -->
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Qtd. Estoque:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputQtdEstoque" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- BOTÕES -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,20">
+                        <Button Content="LIMPAR" Background="Transparent" Foreground="#888" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Padding="15,8" Click="ClicouLimparProduto"/>
+                        <Button Content="SALVAR PRODUTO" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Cursor="Hand" Padding="20,8" BorderThickness="0" Click="ClicouSalvarProduto"/>
+                    </StackPanel>
+
+                    <!-- TABELA DE PRODUTOS -->
+                    <DataGrid x:Name="gridProdutos" Grid.Row="3" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Produto" Binding="{Binding Nome}" Width="2*"/>
+                            <DataGridTextColumn Header="Custo (R$)" Binding="{Binding PrecoCusto, StringFormat=C2}" Width="1*"/>
+                            <DataGridTextColumn Header="Venda (R$)" Binding="{Binding PrecoVenda, StringFormat=C2}" Width="1*"/>
+                            <DataGridTextColumn Header="Estoque" Binding="{Binding QuantidadeEstoque}" Width="1*"/>
+
+                            <!-- Ações -->
+                            <DataGridTemplateColumn Header="Ações" Width="1*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarProduto"/>
+                                            <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirProduto"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <!-- ========================================== -->
+            <!-- ABA 5: NOVA VENDA (PDV)                    -->
+            <!-- ========================================== -->
+            <TabItem Header="🛒 Ponto de Venda">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- 0: Título -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 1: Seleção (Cliente, Produto, Qtd) -->
+                        <RowDefinition Height="*"/>
+                        <!-- 2: Carrinho (DataGrid) -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 3: Rodapé Finalizar -->
+                    </Grid.RowDefinitions>
+
+                    <!-- TÍTULO -->
+                    <TextBlock Grid.Row="0" Text="Frente de Caixa (PDV)" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                    <!-- ÁREA DE SELEÇÃO -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Cliente -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="Selecione o Cliente:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="comboClientesPdv" DisplayMemberPath="Nome" SelectedValuePath="Id" Padding="6" Background="#1a1a1a" Foreground="Black"/>
+                        </StackPanel>
+
+                        <!-- Produto -->
+                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                            <TextBlock Text="Selecione o Produto:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="comboProdutosPdv" DisplayMemberPath="Nome" SelectedValuePath="Id" Padding="6" Background="#1a1a1a" Foreground="Black"/>
+                        </StackPanel>
+
+                        <!-- Quantidade -->
+                        <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                            <TextBlock Text="Qtd:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
+                            <TextBox x:Name="inputQtdPdv" Text="1" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333" TextAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Adicionar ao Carrinho -->
+                        <Button Grid.Column="3" Content="➕ ADICIONAR" Background="#333" Foreground="White" Cursor="Hand" Padding="15,0" Margin="0,21,0,0" BorderThickness="0" Click="ClicouAdicionarAoCarrinho"/>
+                    </Grid>
+
+                    <!-- CARRINHO DE COMPRAS -->
+                    <DataGrid x:Name="gridCarrinho" Grid.Row="2" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Produto" Binding="{Binding Produto.Nome}" Width="2*"/>
+                            <DataGridTextColumn Header="Qtd" Binding="{Binding Quantidade}" Width="1*"/>
+                            <DataGridTextColumn Header="Preço Unit." Binding="{Binding PrecoUnitario, StringFormat=C2}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat=C2}" Width="1.5*"/>
+
+                            <DataGridTemplateColumn Header="Remover" Width="1*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="❌" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouRemoverDoCarrinho"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- RODAPÉ: TOTAL E FINALIZAR -->
+                    <Grid Grid.Row="3" Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="TOTAL DA VENDA:" Foreground="#ccc" FontSize="18" FontWeight="Bold"/>
+                            <TextBlock x:Name="txtTotalVenda" Text="R$ 0,00" Foreground="#D4AF37" FontSize="22" FontWeight="Bold" Margin="10,0,0,0"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="1" Content="FINALIZAR VENDA" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Cursor="Hand" Padding="30,15" BorderThickness="0" Click="ClicouFinalizarVenda"/>
                     </Grid>
                 </Grid>
             </TabItem>

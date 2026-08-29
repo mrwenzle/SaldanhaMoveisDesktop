@@ -1,0 +1,41 @@
+﻿<Window x:Class="SaldanhaMoveisDesktop.MovimentacoesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SaldanhaMoveisDesktop"
+        Title="Histórico de Movimentações" Height="500" Width="850"
+        WindowStartupLocation="CenterScreen" Background="#0a0a0a">
+    <Window.Resources>
+        <local:TipoCorConverter x:Key="TipoCorConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TÍTULO -->
+        <TextBlock Grid.Row="0" Text="Auditoria Financeira - Histórico Completo" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+
+        <!-- TABELA DE DADOS -->
+        <DataGrid x:Name="gridTodasTransacoes" Grid.Row="1" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Data e Hora" Binding="{Binding Data, StringFormat=dd/MM/yyyy HH:mm}" Width="1.5*"/>
+                <DataGridTextColumn Header="Descrição da Movimentação" Binding="{Binding Descricao}" Width="3*"/>
+                <DataGridTextColumn Header="Categoria" Binding="{Binding Categoria}" Width="1.5*"/>
+
+                <!-- Destacando a palavra Entrada ou Saída -->
+                <DataGridTemplateColumn Header="Tipo" Width="1*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Tipo}" FontWeight="Bold" 
+                                       Foreground="{Binding Tipo, Converter={StaticResource TipoCorConverter}, FallbackValue=White}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Valor" Binding="{Binding Valor, StringFormat=C2}" Width="1.5*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
