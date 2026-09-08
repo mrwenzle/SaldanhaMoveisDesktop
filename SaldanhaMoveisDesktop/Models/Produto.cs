@@ -12,5 +12,7 @@ namespace SaldanhaMoveisDesktop
         public int QuantidadeEstoque { get; set; }
         public bool Ativo { get; set; } 
         public DateTime DataCadastro { get; set; }
+        public int? FornecedorId { get; set; }
+        public Fornecedor Fornecedor { get; set; }
     }
 }

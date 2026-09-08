@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SaldanhaMoveisDesktop;
 
@@ -10,9 +11,11 @@ using SaldanhaMoveisDesktop;
 namespace SaldanhaMoveisDesktop.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260905152039_TabelaFornecedores")]
+    partial class TabelaFornecedores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
@@ -145,9 +148,6 @@ namespace SaldanhaMoveisDesktop.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("FornecedorId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -162,8 +162,6 @@ namespace SaldanhaMoveisDesktop.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FornecedorId");
 
                     b.ToTable("Produtos");
                 });
@@ -240,15 +238,6 @@ namespace SaldanhaMoveisDesktop.Migrations
                     b.Navigation("Produto");
 
                     b.Navigation("Venda");
-                });
-
-            modelBuilder.Entity("SaldanhaMoveisDesktop.Produto", b =>
-                {
-                    b.HasOne("SaldanhaMoveisDesktop.Fornecedor", "Fornecedor")
-                        .WithMany()
-                        .HasForeignKey("FornecedorId");
-
-                    b.Navigation("Fornecedor");
                 });
 
             modelBuilder.Entity("SaldanhaMoveisDesktop.Venda", b =>

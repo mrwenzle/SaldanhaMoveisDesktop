@@ -3,41 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
 using LiveCharts;
 using LiveCharts.Wpf;
-using System.Windows.Media;
 
 namespace SaldanhaMoveisDesktop
 {
     public partial class SistemaERP : Window
     {
-
         private AppDbContext dbContext;
-        private Transacao transacaoEmEdicao = null;
         private PagamentoFuncionario pagamentoEmEdicao = null;
         private Cliente clienteEmEdicao = null;
         private Produto produtoEmEdicao = null;
+        private Fornecedor fornecedorEmEdicao = null;
         private List<ItemVenda> carrinhoAtual = new List<ItemVenda>();
 
         public SistemaERP()
         {
             InitializeComponent();
 
-            // O Único Motor do Sistema!
+            // Inicializa e garante as migrações do banco de dados SQLite
             dbContext = new AppDbContext();
             dbContext.Database.Migrate();
 
-            // Atualiza TODAS as abas
+            // Atualiza todas as abas
             AtualizarDashboard();
             AtualizarTelaFuncionarios();
             AtualizarTelaClientes();
             AtualizarTelaProdutos();
+            AtualizarTelaFornecedores();
             AtualizarCombosPDV();
         }
 
         // ==========================================
-        // EVENTOS DA ABA 1: DASHBOARD
+        // ABA 1: DASHBOARD GERENCIAL (COM GRÁFICOS)
         // ==========================================
         private void AtualizarDashboard()
         {
@@ -51,18 +51,22 @@ namespace SaldanhaMoveisDesktop
             decimal despesasMes = transacoesMes.Where(t => t.Tipo == "Saída" || t.Tipo == "Saida").Sum(t => t.Valor);
             decimal lucroMes = receitasMes - despesasMes;
 
+            // Preenche os Cards
             txtFaturamentoMes.Text = receitasMes.ToString("C");
             txtDespesasMes.Text = despesasMes.ToString("C");
             txtLucroMes.Text = lucroMes.ToString("C");
             txtVendasHoje.Text = qtdVendasHoje.ToString();
 
+            // GRÁFICO 1: BARRAS (ÚLTIMOS 7 DIAS)
             var valoresSemana = new ChartValues<decimal>();
             var labelsSemana = new List<string>();
 
             for (int i = 6; i >= 0; i--)
             {
                 var dia = hoje.AddDays(-i);
-                var faturamentoDia = dbContext.Transacoes.Where(t => t.Data.Date == dia.Date && t.Tipo == "Entrada").Sum(t => t.Valor);
+                var faturamentoDia = dbContext.Transacoes
+                    .Where(t => t.Data.Date == dia.Date && t.Tipo == "Entrada")
+                    .Sum(t => t.Valor);
 
                 valoresSemana.Add(faturamentoDia);
                 labelsSemana.Add(dia.ToString("dd/MM"));
@@ -74,7 +78,7 @@ namespace SaldanhaMoveisDesktop
                 {
                     Title = "Entradas",
                     Values = valoresSemana,
-                    Fill = new SolidColorBrush(Color.FromRgb(212, 175, 55))
+                    Fill = new SolidColorBrush(Color.FromRgb(212, 175, 55)) // Dourado
                 }
             };
 
@@ -84,6 +88,7 @@ namespace SaldanhaMoveisDesktop
             graficoSemana.AxisY.Clear();
             graficoSemana.AxisY.Add(new Axis { LabelFormatter = val => val.ToString("C0"), Foreground = Brushes.LightGray });
 
+            // GRÁFICO 2: DONUT (RECEITAS VS DESPESAS)
             graficoMes.Series = new SeriesCollection
             {
                 new PieSeries { Title = "Receitas", Values = new ChartValues<decimal> { receitasMes }, Fill = Brushes.MediumSeaGreen, DataLabels = true },
@@ -91,9 +96,6 @@ namespace SaldanhaMoveisDesktop
             };
         }
 
-        // ==========================================
-        // EVENTO DO BOTÃO DE RELATÓRIO DE MOVIMENTAÇÕES
-        // ==========================================
         private void ClicouVerMovimentacoes(object sender, RoutedEventArgs e)
         {
             var janelaMovimentacoes = new MovimentacoesWindow();
@@ -101,7 +103,7 @@ namespace SaldanhaMoveisDesktop
         }
 
         // ==========================================
-        // EVENTOS DA ABA 2: FUNCIONÁRIOS 
+        // ABA 2: FUNCIONÁRIOS (RH + DEBITO NO CAIXA)
         // ==========================================
         private void ClicouRegistrarFuncionario(object sender, RoutedEventArgs e)
         {
@@ -125,6 +127,7 @@ namespace SaldanhaMoveisDesktop
                     };
                     dbContext.Pagamentos.Add(pag);
 
+                    // Lança a despesa de folha de pagamento no caixa
                     var transacaoDespesa = new Transacao
                     {
                         Descricao = $"Salário - {inputNomeFunc.Text} (Ref: {inputMesRef.Text})",
@@ -198,7 +201,7 @@ namespace SaldanhaMoveisDesktop
         }
 
         // ==========================================
-        // EVENTOS DA ABA 3: CLIENTES
+        // ABA 3: CLIENTES
         // ==========================================
         private void ClicouSalvarCliente(object sender, RoutedEventArgs e)
         {
@@ -280,7 +283,7 @@ namespace SaldanhaMoveisDesktop
         }
 
         // ==========================================
-        // EVENTOS DA ABA 4: PRODUTOS
+        // ABA 4: PRODUTOS (REGIME DE CAIXA NO ESTOQUE)
         // ==========================================
         private void ClicouSalvarProduto(object sender, RoutedEventArgs e)
         {
@@ -294,6 +297,8 @@ namespace SaldanhaMoveisDesktop
             {
                 if (produtoEmEdicao == null)
                 {
+                    int? fornecedorIdSelecionado = comboFornecedorProduto.SelectedValue as int?;
+
                     var novoProduto = new Produto
                     {
                         Nome = inputNomeProduto.Text,
@@ -302,9 +307,25 @@ namespace SaldanhaMoveisDesktop
                         PrecoVenda = venda,
                         QuantidadeEstoque = qtd,
                         Ativo = true,
-                        DataCadastro = DateTime.Now
+                        DataCadastro = DateTime.Now,
+                        FornecedorId = fornecedorIdSelecionado // <--- Vínculo salvo no banco!
                     };
                     dbContext.Produtos.Add(novoProduto);
+
+                    // Lança a despesa de compra de estoque no caixa
+                    decimal valorGastoNaCompra = custo * qtd;
+                    if (valorGastoNaCompra > 0)
+                    {
+                        var despesaEstoque = new Transacao
+                        {
+                            Descricao = $"Compra de Estoque: {novoProduto.Nome} ({qtd} un.)",
+                            Valor = valorGastoNaCompra,
+                            Tipo = "Saída",
+                            Categoria = "Pagamento a Fornecedores",
+                            Data = DateTime.Now
+                        };
+                        dbContext.Transacoes.Add(despesaEstoque);
+                    }
                 }
                 else
                 {
@@ -312,18 +333,98 @@ namespace SaldanhaMoveisDesktop
                     produtoEmEdicao.PrecoCusto = custo;
                     produtoEmEdicao.PrecoVenda = venda;
                     produtoEmEdicao.QuantidadeEstoque = qtd;
+                    produtoEmEdicao.FornecedorId = comboFornecedorProduto.SelectedValue as int?;
                 }
 
                 dbContext.SaveChanges();
                 ClicouLimparProduto(null, null);
                 AtualizarTelaProdutos();
+                AtualizarDashboard();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro: {ex.Message}");
             }
         }
+        // ==========================================
+        // ABA: FORNECEDORES
+        // ==========================================
+        private void ClicouSalvarFornecedor(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(inputNomeFornecedor.Text))
+            {
+                MessageBox.Show("Preencha o Nome do Fornecedor.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
+            try
+            {
+                if (fornecedorEmEdicao == null)
+                {
+                    var novoFornecedor = new Fornecedor
+                    {
+                        NomeFantasia = inputNomeFornecedor.Text,
+                        Cnpj = inputCnpjFornecedor.Text,
+                        Telefone = inputTelefoneFornecedor.Text,
+                        DataCadastro = DateTime.Now
+                    };
+                    dbContext.Fornecedores.Add(novoFornecedor);
+                }
+                else
+                {
+                    fornecedorEmEdicao.NomeFantasia = inputNomeFornecedor.Text;
+                    fornecedorEmEdicao.Cnpj = inputCnpjFornecedor.Text;
+                    fornecedorEmEdicao.Telefone = inputTelefoneFornecedor.Text;
+                }
+
+                dbContext.SaveChanges();
+                ClicouLimparFornecedor(null, null);
+                AtualizarTelaFornecedores();
+                AtualizarTelaProdutos(); // Recarrega o ComboBox na tela de produtos automaticamente
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao salvar fornecedor: {ex.Message}");
+            }
+        }
+
+        private void ClicouEditarFornecedor(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is Fornecedor f)
+            {
+                inputNomeFornecedor.Text = f.NomeFantasia;
+                inputCnpjFornecedor.Text = f.Cnpj;
+                inputTelefoneFornecedor.Text = f.Telefone;
+                fornecedorEmEdicao = f;
+            }
+        }
+
+        private void ClicouExcluirFornecedor(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is Fornecedor f && MessageBox.Show($"Deseja excluir {f.NomeFantasia}?", "Confirmar", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                dbContext.Fornecedores.Remove(f);
+                dbContext.SaveChanges();
+                AtualizarTelaFornecedores();
+                AtualizarTelaProdutos();
+            }
+        }
+
+        private void ClicouLimparFornecedor(object sender, RoutedEventArgs e)
+        {
+            inputNomeFornecedor.Clear();
+            inputCnpjFornecedor.Clear();
+            inputTelefoneFornecedor.Clear();
+            fornecedorEmEdicao = null;
+            inputNomeFornecedor.Focus();
+        }
+
+        private void AtualizarTelaFornecedores()
+        {
+            gridFornecedores.ItemsSource = null;
+            gridFornecedores.Items.Clear();
+            gridFornecedores.ItemsSource = dbContext.Fornecedores.ToList();
+        }
         private void ClicouEditarProduto(object sender, RoutedEventArgs e)
         {
             if ((sender as Button)?.DataContext is Produto p)
@@ -332,6 +433,7 @@ namespace SaldanhaMoveisDesktop
                 inputPrecoCusto.Text = p.PrecoCusto.ToString();
                 inputPrecoVenda.Text = p.PrecoVenda.ToString();
                 inputQtdEstoque.Text = p.QuantidadeEstoque.ToString();
+                comboFornecedorProduto.SelectedValue = p.FornecedorId;
                 produtoEmEdicao = p;
             }
         }
@@ -361,10 +463,11 @@ namespace SaldanhaMoveisDesktop
             gridProdutos.ItemsSource = null;
             gridProdutos.Items.Clear();
             gridProdutos.ItemsSource = dbContext.Produtos.ToList();
+            comboFornecedorProduto.ItemsSource = dbContext.Fornecedores.ToList();
         }
 
         // ==========================================
-        // EVENTOS DA ABA 5: PONTO DE VENDA (PDV)
+        // ABA 5: PONTO DE VENDA (PDV)
         // ==========================================
         private void AtualizarCombosPDV()
         {
@@ -430,12 +533,13 @@ namespace SaldanhaMoveisDesktop
                     if (produtoBanco != null) produtoBanco.QuantidadeEstoque -= item.Quantidade;
                 }
 
+                // Gera a receita no Fluxo de Caixa
                 var transacaoAutomatica = new Transacao
                 {
                     Descricao = $"Venda - Cliente: {clienteSelecionado.Nome}",
                     Valor = novaVenda.ValorTotal,
                     Tipo = "Entrada",
-                    Categoria = "Vendas", 
+                    Categoria = "Vendas",
                     Data = DateTime.Now
                 };
                 dbContext.Transacoes.Add(transacaoAutomatica);
@@ -455,11 +559,6 @@ namespace SaldanhaMoveisDesktop
             {
                 MessageBox.Show($"Erro: {ex.Message}");
             }
-        }
-
-        private void gridCarrinho_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
     }
 }

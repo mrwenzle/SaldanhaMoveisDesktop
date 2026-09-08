@@ -255,7 +255,7 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <!-- COLE A ABA DE CLIENTES EXATAMENTE AQUI -->
+            <!-- ABA DE CLIENTES -->
             <TabItem Header="👥 Clientes">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
@@ -342,81 +342,132 @@
             <!-- ========================================== -->
             <!-- ABA 4: PRODUTOS (ESTOQUE)                  -->
             <!-- ========================================== -->
-            <TabItem Header="📦 Produtos">
+            <!-- ABA FORNECEDORES -->
+            <TabItem Header="Fornecedores">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- 0: Título -->
                         <RowDefinition Height="Auto"/>
-                        <!-- 1: Formulário -->
                         <RowDefinition Height="Auto"/>
-                        <!-- 2: Botões -->
                         <RowDefinition Height="*"/>
-                        <!-- 3: Tabela -->
                     </Grid.RowDefinitions>
 
                     <!-- TÍTULO -->
-                    <TextBlock Grid.Row="0" Text="Controle de Estoque" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                    <TextBlock Grid.Row="0" Text="Gestão de Fornecedores" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
                     <!-- FORMULÁRIO -->
-                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                    <Grid Grid.Row="1" Margin="0,0,0,15">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
-                            <!-- Nome -->
-                            <ColumnDefinition Width="1*"/>
-                            <!-- Preço Custo -->
-                            <ColumnDefinition Width="1*"/>
-                            <!-- Preço Venda -->
-                            <ColumnDefinition Width="1*"/>
-                            <!-- Quantidade -->
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="1.5*"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                        <!-- Nome do Produto -->
-                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                            <TextBlock Text="Nome do Produto:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
-                            <TextBox x:Name="inputNomeProduto" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
-                        </StackPanel>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Nome Fantasia / Razão Social:" Foreground="#ccc" FontSize="12" Margin="0,0,10,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="CNPJ:" Foreground="#ccc" FontSize="12" Margin="0,0,10,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Telefone:" Foreground="#ccc" FontSize="12" Margin="0,0,0,2"/>
 
-                        <!-- Preço de Custo -->
-                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                            <TextBlock Text="Preço de Custo (R$):" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
-                            <TextBox x:Name="inputPrecoCusto" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
-                        </StackPanel>
-
-                        <!-- Preço de Venda -->
-                        <StackPanel Grid.Column="2" Margin="0,0,10,0">
-                            <TextBlock Text="Preço de Venda (R$):" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
-                            <TextBox x:Name="inputPrecoVenda" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
-                        </StackPanel>
-
-                        <!-- Quantidade em Estoque -->
-                        <StackPanel Grid.Column="3">
-                            <TextBlock Text="Qtd. Estoque:" Foreground="#ccc" FontSize="12" Margin="0,0,0,5"/>
-                            <TextBox x:Name="inputQtdEstoque" Padding="8" Background="#1a1a1a" Foreground="White" BorderBrush="#333"/>
-                        </StackPanel>
+                        <TextBox x:Name="inputNomeFornecedor" Grid.Row="1" Grid.Column="0" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="inputCnpjFornecedor" Grid.Row="1" Grid.Column="1" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="inputTelefoneFornecedor" Grid.Row="1" Grid.Column="2" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center"/>
                     </Grid>
 
-                    <!-- BOTÕES -->
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,20">
-                        <Button Content="LIMPAR" Background="Transparent" Foreground="#888" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Padding="15,8" Click="ClicouLimparProduto"/>
-                        <Button Content="SALVAR PRODUTO" Background="#D4AF37" Foreground="#0a0a0a" FontWeight="Bold" Cursor="Hand" Padding="20,8" BorderThickness="0" Click="ClicouSalvarProduto"/>
+                    <!-- BOTÕES DE AÇÃO -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
+                        <Button Content="LIMPAR" Click="ClicouLimparFornecedor" Background="Transparent" Foreground="#888" BorderThickness="0" Margin="0,0,15,0" Cursor="Hand"/>
+                        <Button Content="SALVAR FORNECEDOR" Click="ClicouSalvarFornecedor" Background="#D4AF37" Foreground="Black" FontWeight="Bold" Padding="15,8" Cursor="Hand"/>
                     </StackPanel>
 
-                    <!-- TABELA DE PRODUTOS -->
-                    <DataGrid x:Name="gridProdutos" Grid.Row="3" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+                    <!-- TABELA DE FORNECEDORES -->
+                    <DataGrid x:Name="gridFornecedores" Grid.Row="3" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Produto" Binding="{Binding Nome}" Width="2*"/>
-                            <DataGridTextColumn Header="Custo (R$)" Binding="{Binding PrecoCusto, StringFormat=C2}" Width="1*"/>
-                            <DataGridTextColumn Header="Venda (R$)" Binding="{Binding PrecoVenda, StringFormat=C2}" Width="1*"/>
-                            <DataGridTextColumn Header="Estoque" Binding="{Binding QuantidadeEstoque}" Width="1*"/>
-
-                            <!-- Ações -->
-                            <DataGridTemplateColumn Header="Ações" Width="1*">
+                            <DataGridTextColumn Header="Empresa / Nome Fantasia" Binding="{Binding NomeFantasia}" Width="2*"/>
+                            <DataGridTextColumn Header="CNPJ" Binding="{Binding Cnpj}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Telefone" Binding="{Binding Telefone}" Width="1.5*"/>
+                            <DataGridTemplateColumn Header="Ações" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Content="✏️" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,15,0" Click="ClicouEditarProduto"/>
-                                            <Button Content="🗑️" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="ClicouExcluirProduto"/>
+                                            <Button Content="✏️" Click="ClicouEditarFornecedor" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,5,0"/>
+                                            <Button Content="🗑️" Click="ClicouExcluirFornecedor" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Produtos">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- TÍTULO -->
+                    <TextBlock Grid.Row="0" Text="Gestão de Produtos e Estoque" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                    <!-- FORMULÁRIO (INPUTS LADO A LADO) -->
+                    <Grid Grid.Row="1" Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <!-- Nome do Produto -->
+                            <ColumnDefinition Width="2*"/>
+                            <!-- Fornecedor ao lado -->
+                            <ColumnDefinition Width="1.5*"/>
+                            <!-- Preço Custo -->
+                            <ColumnDefinition Width="1.5*"/>
+                            <!-- Preço Venda -->
+                            <ColumnDefinition Width="1*"/>
+                            <!-- Qtd Estoque -->
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Rótulos -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Nome do Produto:" Foreground="#ccc" FontSize="12" Margin="0,0,10,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Fornecedor:" Foreground="#ccc" FontSize="12" Margin="0,0,10,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Preço de Custo (R$):" Foreground="#ccc" FontSize="12" Margin="0,0,10,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text="Preço de Venda (R$):" Foreground="#ccc" FontSize="12" Margin="0,0,10,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="Qtd. Estoque:" Foreground="#ccc" FontSize="12" Margin="0,0,0,2"/>
+
+                        <!-- Inputs únicos -->
+                        <TextBox x:Name="inputNomeProduto" Grid.Row="1" Grid.Column="0" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox x:Name="comboFornecedorProduto" Grid.Row="1" Grid.Column="1" DisplayMemberPath="NomeFantasia" SelectedValuePath="Id" Height="30" Background="#222" Foreground="Black" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="inputPrecoCusto" Grid.Row="1" Grid.Column="2" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="inputPrecoVenda" Grid.Row="1" Grid.Column="3" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox x:Name="inputQtdEstoque" Grid.Row="1" Grid.Column="4" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center"/>
+                    </Grid>
+
+                    <!-- BOTOES -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
+                        <Button Content="LIMPAR" Click="ClicouLimparProduto" Background="Transparent" Foreground="#888" BorderThickness="0" Margin="0,0,15,0" Cursor="Hand"/>
+                        <Button Content="SALVAR PRODUTO" Click="ClicouSalvarProduto" Background="#D4AF37" Foreground="Black" FontWeight="Bold" Padding="15,8" Cursor="Hand"/>
+                    </StackPanel>
+
+                    <!-- TABELA DE PRODUTOS ÚNICA -->
+                    <DataGrid x:Name="gridProdutos" Grid.Row="3" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Produto" Binding="{Binding Nome}" Width="2*"/>
+                            <DataGridTextColumn Header="Fornecedor" Binding="{Binding Fornecedor.NomeFantasia, FallbackValue='Sem Fornecedor'}" Width="2*"/>
+                            <DataGridTextColumn Header="Custo (R$)" Binding="{Binding PrecoCusto, StringFormat=C2}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Venda (R$)" Binding="{Binding PrecoVenda, StringFormat=C2}" Width="1.5*"/>
+                            <DataGridTextColumn Header="Estoque" Binding="{Binding QuantidadeEstoque}" Width="1*"/>
+                            <DataGridTemplateColumn Header="Ações" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="✏️" Click="ClicouEditarProduto" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="0,0,5,0"/>
+                                            <Button Content="🗑️" Click="ClicouExcluirProduto" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -476,7 +527,7 @@
                     </Grid>
 
                     <!-- CARRINHO DE COMPRAS -->
-                    <DataGrid x:Name="gridCarrinho" Grid.Row="2" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" SelectionChanged="gridCarrinho_SelectionChanged">
+                    <DataGrid x:Name="gridCarrinho" Grid.Row="2" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="#D4AF37" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Produto" Binding="{Binding Produto.Nome}" Width="2*"/>
                             <DataGridTextColumn Header="Qtd" Binding="{Binding Quantidade}" Width="1*"/>
