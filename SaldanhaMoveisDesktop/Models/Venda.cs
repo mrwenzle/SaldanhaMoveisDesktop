@@ -6,17 +6,15 @@ namespace SaldanhaMoveisDesktop
     public class Venda
     {
         public int Id { get; set; }
-
         public int ClienteId { get; set; }
-        public Cliente Cliente { get; set; }
-
-        public decimal ValorTotal { get; set; }
         public DateTime DataVenda { get; set; }
-        public string Status { get; set; }
-
+        public string Status { get; set; } = "Concluída";
+        public decimal ValorTotal { get; set; }
         public string FormaPagamento { get; set; }
         public decimal Desconto { get; set; }
         public decimal Frete { get; set; }
+
+        public Cliente Cliente { get; set; }
         public List<ItemVenda> Itens { get; set; } = new List<ItemVenda>();
     }
 }

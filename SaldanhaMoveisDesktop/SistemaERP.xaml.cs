@@ -43,68 +43,115 @@ namespace SaldanhaMoveisDesktop
         // ==========================================
         private void AtualizarDashboard()
         {
-            var inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            var hoje = DateTime.Today;
-
-            var transacoesMes = dbContext.Transacoes.Where(t => t.Data >= inicioMes).ToList();
-            int qtdVendasHoje = dbContext.Vendas.Count(v => v.DataVenda.Date == hoje);
-
-            decimal receitasMes = transacoesMes.Where(t => t.Tipo == "Entrada").Sum(t => t.Valor);
-            decimal despesasMes = transacoesMes.Where(t => t.Tipo == "Saída" || t.Tipo == "Saida").Sum(t => t.Valor);
-            decimal lucroMes = receitasMes - despesasMes;
-
-            // Preenche os Cards
-            txtFaturamentoMes.Text = receitasMes.ToString("C");
-            txtDespesasMes.Text = despesasMes.ToString("C");
-            txtLucroMes.Text = lucroMes.ToString("C");
-            txtVendasHoje.Text = qtdVendasHoje.ToString();
-
-            // GRÁFICO 1: BARRAS (ÚLTIMOS 7 DIAS)
-            var valoresSemana = new ChartValues<decimal>();
-            var labelsSemana = new List<string>();
-
-            for (int i = 6; i >= 0; i--)
+            try
             {
-                var dia = hoje.AddDays(-i);
-                var faturamentoDia = dbContext.Transacoes
-                    .Where(t => t.Data.Date == dia.Date && t.Tipo == "Entrada")
-                    .Sum(t => t.Valor);
+                var hoje = DateTime.Today;
+                var mesAtual = DateTime.Now.Month;
+                var anoAtual = DateTime.Now.Year;
 
-                valoresSemana.Add(faturamentoDia);
-                labelsSemana.Add(dia.ToString("dd/MM"));
-            }
+                // 1. Somatório do Faturamento do Mês (Vendas do mês atual)
+                decimal faturamentoMes = dbContext.Vendas
+                    .Where(v => v.DataVenda.Month == mesAtual && v.DataVenda.Year == anoAtual)
+                    .Sum(v => (decimal?)v.ValorTotal) ?? 0;
 
-            graficoSemana.Series = new SeriesCollection
-            {
-                new ColumnSeries
+                // 2. Somatório das Despesas do Mês
+                decimal despesasMes = dbContext.Despesas
+                    .Where(d => d.DataCadastro.Month == mesAtual && d.DataCadastro.Year == anoAtual)
+                    .Sum(d => (decimal?)d.Valor) ?? 0;
+
+                // 3. Lucro Líquido Real
+                decimal lucroMes = faturamentoMes - despesasMes;
+
+                // 4. Totais do Dia (Hoje)
+                int vendasHojeCount = dbContext.Vendas
+                    .Count(v => v.DataVenda.Date == hoje);
+
+                decimal despesasHoje = dbContext.Despesas
+                    .Where(d => d.DataCadastro.Date == hoje)
+                    .Sum(d => (decimal?)d.Valor) ?? 0;
+
+                // Atualiza os cartões numéricos da interface
+                txtFaturamentoMes.Text = faturamentoMes.ToString("C2");
+                txtDespesasMes.Text = despesasMes.ToString("C2");
+                txtLucroMes.Text = lucroMes.ToString("C2");
+                txtVendasHoje.Text = vendasHojeCount.ToString();
+                txtDespesasHoje.Text = despesasHoje.ToString("C2");
+
+                // ==========================================
+                // 5. ATUALIZAÇÃO DO GRÁFICO 1: ÚLTIMOS 7 DIAS
+                // ==========================================
+                var ultimos7Dias = Enumerable.Range(0, 7)
+                    .Select(i => hoje.AddDays(-6 + i))
+                    .ToList();
+
+                var valoresVendasDias = new ChartValues<decimal>();
+                var labelsDias = new List<string>();
+
+                foreach (var dia in ultimos7Dias)
                 {
-                    Title = "Entradas",
-                    Values = valoresSemana,
-                    Fill = new SolidColorBrush(Color.FromRgb(212, 175, 55)) // Dourado
+                    decimal totalDia = dbContext.Vendas
+                        .Where(v => v.DataVenda.Date == dia)
+                        .Sum(v => (decimal?)v.ValorTotal) ?? 0;
+
+                    valoresVendasDias.Add(totalDia);
+                    labelsDias.Add(dia.ToString("dd/MM"));
                 }
-            };
 
-            graficoSemana.AxisX.Clear();
-            graficoSemana.AxisX.Add(new Axis { Labels = labelsSemana, Foreground = Brushes.LightGray });
-
-            graficoSemana.AxisY.Clear();
-            graficoSemana.AxisY.Add(new Axis { LabelFormatter = val => val.ToString("C0"), Foreground = Brushes.LightGray });
-
-            // GRÁFICO 2: DONUT (RECEITAS VS DESPESAS)
-            graficoMes.Series = new SeriesCollection
+                graficoSemana.Series = new SeriesCollection
+        {
+            new LineSeries
             {
-                new PieSeries { Title = "Receitas", Values = new ChartValues<decimal> { receitasMes }, Fill = Brushes.MediumSeaGreen, DataLabels = true },
-                new PieSeries { Title = "Despesas", Values = new ChartValues<decimal> { despesasMes }, Fill = Brushes.IndianRed, DataLabels = true }
-            };
-            // Calcula Despesas de Hoje
-            var inicioDoDia = DateTime.Today;
-            var fimDoDia = DateTime.Today.AddDays(1).AddTicks(-1);
+                Title = "Vendas (R$)",
+                Values = valoresVendasDias,
+                Stroke = (Brush)new BrushConverter().ConvertFrom("#D4AF37"),
+                Fill = Brushes.Transparent,
+                PointGeometrySize = 8
+            }
+        };
 
-            var despesasHoje = dbContext.Despesas
-                .Where(d => d.DataCadastro >= inicioDoDia && d.DataCadastro <= fimDoDia)
-                .Sum(d => d.Valor);
+                graficoSemana.AxisX.Clear();
+                graficoSemana.AxisX.Add(new Axis
+                {
+                    Title = "Dias",
+                    Labels = labelsDias,
+                    Foreground = Brushes.White
+                });
 
-            txtDespesasHoje.Text = despesasHoje.ToString("C2");
+                graficoSemana.AxisY.Clear();
+                graficoSemana.AxisY.Add(new Axis
+                {
+                    Title = "Valor (R$)",
+                    Foreground = Brushes.White,
+                    LabelFormatter = val => val.ToString("C0")
+                });
+
+                // ==========================================
+                // 6. ATUALIZAÇÃO DO GRÁFICO 2: RECEITAS X DESPESAS
+                // ==========================================
+                graficoMes.Series = new SeriesCollection
+        {
+            new PieSeries
+            {
+                Title = "Faturamento",
+                Values = new ChartValues<decimal> { faturamentoMes },
+                DataLabels = true,
+                Fill = (Brush)new BrushConverter().ConvertFrom("#00ff00")
+            },
+            new PieSeries
+            {
+                Title = "Despesas",
+                Values = new ChartValues<decimal> { despesasMes },
+                DataLabels = true,
+                Fill = (Brush)new BrushConverter().ConvertFrom("#ff4444")
+            }
+        };
+            }
+            catch (Exception ex)
+            {
+                // Exibe o erro real caso ocorra alguma falha de leitura
+                string erro = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                MessageBox.Show($"Erro ao atualizar o Dashboard: {erro}", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void ClicouVerMovimentacoes(object sender, RoutedEventArgs e)
@@ -296,67 +343,126 @@ namespace SaldanhaMoveisDesktop
         // ==========================================
         // ABA 4: PRODUTOS (REGIME DE CAIXA NO ESTOQUE)
         // ==========================================
+        private void ClicouEditarProduto(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is Produto p)
+            {
+                produtoEmEdicao = p;
+                inputNomeProduto.Text = p.Nome;
+                comboFornecedorProduto.SelectedValue = p.FornecedorId;
+                inputPrecoCusto.Text = p.PrecoCusto.ToString("N2");
+                inputPrecoVenda.Text = p.PrecoVenda.ToString("N2");
+                inputQtdEstoque.Text = p.QuantidadeEstoque.ToString();
+            }
+        }
+
         private void ClicouSalvarProduto(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(inputNomeProduto.Text) || !decimal.TryParse(inputPrecoCusto.Text, out decimal custo) || !decimal.TryParse(inputPrecoVenda.Text, out decimal venda) || !int.TryParse(inputQtdEstoque.Text, out int qtd))
+            if (string.IsNullOrWhiteSpace(inputNomeProduto.Text))
             {
-                MessageBox.Show("Preencha todos os campos numericamente.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Informe o nome do produto.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            decimal.TryParse(inputPrecoCusto.Text, out decimal precoCusto);
+            decimal.TryParse(inputPrecoVenda.Text, out decimal precoVenda);
+            int.TryParse(inputQtdEstoque.Text, out int qtdEstoque);
+            int? fornecedorId = comboFornecedorProduto.SelectedValue as int?;
 
             try
             {
                 if (produtoEmEdicao == null)
                 {
-                    int? fornecedorIdSelecionado = comboFornecedorProduto.SelectedValue as int?;
-
+                    // CADASTRO DE NOVO PRODUTO
                     var novoProduto = new Produto
                     {
                         Nome = inputNomeProduto.Text,
-                        Descricao = "Geral",
-                        PrecoCusto = custo,
-                        PrecoVenda = venda,
-                        QuantidadeEstoque = qtd,
-                        Ativo = true,
-                        DataCadastro = DateTime.Now,
-                        FornecedorId = fornecedorIdSelecionado // <--- Vínculo salvo no banco!
+                        FornecedorId = fornecedorId,
+                        PrecoCusto = precoCusto,
+                        PrecoVenda = precoVenda,
+                        QuantidadeEstoque = qtdEstoque
                     };
                     dbContext.Produtos.Add(novoProduto);
 
-                    // Lança a despesa de compra de estoque no caixa
-                    decimal valorGastoNaCompra = custo * qtd;
-                    if (valorGastoNaCompra > 0)
+                    // Lança o custo total do lote inicial como Despesa no Dashboard (Regime de Caixa)
+                    if (precoCusto > 0 && qtdEstoque > 0)
                     {
-                        var despesaEstoque = new Transacao
+                        var despesaEstoque = new Despesa
                         {
-                            Descricao = $"Compra de Estoque: {novoProduto.Nome} ({qtd} un.)",
-                            Valor = valorGastoNaCompra,
-                            Tipo = "Saída",
-                            Categoria = "Pagamento a Fornecedores",
-                            Data = DateTime.Now
+                            Descricao = $"Compra de Estoque: {novoProduto.Nome} ({qtdEstoque} un)",
+                            Valor = precoCusto * qtdEstoque,
+                            DataCadastro = DateTime.Now
                         };
-                        dbContext.Transacoes.Add(despesaEstoque);
+                        dbContext.Despesas.Add(despesaEstoque);
                     }
                 }
                 else
                 {
+                    // EDIÇÃO DE PRODUTO EXISTENTE
+                    int qtdAnterior = produtoEmEdicao.QuantidadeEstoque;
+
                     produtoEmEdicao.Nome = inputNomeProduto.Text;
-                    produtoEmEdicao.PrecoCusto = custo;
-                    produtoEmEdicao.PrecoVenda = venda;
-                    produtoEmEdicao.QuantidadeEstoque = qtd;
-                    produtoEmEdicao.FornecedorId = comboFornecedorProduto.SelectedValue as int?;
+                    produtoEmEdicao.FornecedorId = fornecedorId;
+                    produtoEmEdicao.PrecoCusto = precoCusto;
+                    produtoEmEdicao.PrecoVenda = precoVenda;
+                    produtoEmEdicao.QuantidadeEstoque = qtdEstoque;
+
+                    // Se o stock aumentou na edição, lança a diferença comprada como Despesa
+                    if (qtdEstoque > qtdAnterior && precoCusto > 0)
+                    {
+                        int qtdComprada = qtdEstoque - qtdAnterior;
+                        var despesaEstoque = new Despesa
+                        {
+                            Descricao = $"Entrada de Estoque: {produtoEmEdicao.Nome} (+{qtdComprada} un)",
+                            Valor = precoCusto * qtdComprada,
+                            DataCadastro = DateTime.Now
+                        };
+                        dbContext.Despesas.Add(despesaEstoque);
+                    }
                 }
 
                 dbContext.SaveChanges();
+                MessageBox.Show("Produto salvo com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+
                 ClicouLimparProduto(null, null);
                 AtualizarTelaProdutos();
-                AtualizarDashboard();
+                AtualizarDashboard(); // Recarrega os valores de Lucro e Despesas no Dashboard
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro: {ex.Message}");
+                MessageBox.Show($"Erro ao salvar produto: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void ClicouExcluirProduto(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is Produto p && MessageBox.Show($"Excluir {p.Nome}?", "Confirmar", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                dbContext.Produtos.Remove(p);
+                dbContext.SaveChanges();
+                AtualizarTelaProdutos();
+            }
+        }
+
+        private void ClicouLimparProduto(object sender, RoutedEventArgs e)
+        {
+            inputNomeProduto.Clear();
+            comboFornecedorProduto.SelectedIndex = -1;
+            inputPrecoCusto.Clear();
+            inputPrecoVenda.Clear();
+            inputQtdEstoque.Clear();
+            produtoEmEdicao = null;
+            inputNomeProduto.Focus();
+        }
+
+        private void AtualizarTelaProdutos()
+        {
+            gridProdutos.ItemsSource = null;
+            gridProdutos.Items.Clear();
+            gridProdutos.ItemsSource = dbContext.Produtos.ToList();
+            comboFornecedorProduto.ItemsSource = dbContext.Fornecedores.ToList();
+        }
+
         // ==========================================
         // ABA: FORNECEDORES
         // ==========================================
@@ -399,41 +505,6 @@ namespace SaldanhaMoveisDesktop
             }
         }
 
-        // ==========================================
-        // ABA: DESPESAS
-        // ==========================================
-        private void ClicouSalvarDespesa(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(inputDescricaoDespesa.Text) || !decimal.TryParse(inputValorDespesa.Text, out decimal valor))
-            {
-                MessageBox.Show("Preencha a descrição e digite um valor válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var novaDespesa = new Despesa
-            {
-                Descricao = inputDescricaoDespesa.Text,
-                Valor = valor,
-                DataCadastro = DateTime.Now
-            };
-
-            dbContext.Despesas.Add(novaDespesa);
-            dbContext.SaveChanges();
-
-            inputDescricaoDespesa.Clear();
-            inputValorDespesa.Clear();
-            inputDescricaoDespesa.Focus();
-
-            AtualizarTelaDespesas();
-            AtualizarDashboard(); // Atualiza o painel inicial na hora
-        }
-
-        private void AtualizarTelaDespesas()
-        {
-            gridDespesas.ItemsSource = dbContext.Despesas
-                .OrderByDescending(d => d.DataCadastro)
-                .ToList();
-        }
         private void ClicouEditarFornecedor(object sender, RoutedEventArgs e)
         {
             if ((sender as Button)?.DataContext is Fornecedor f)
@@ -471,45 +542,41 @@ namespace SaldanhaMoveisDesktop
             gridFornecedores.Items.Clear();
             gridFornecedores.ItemsSource = dbContext.Fornecedores.ToList();
         }
-        private void ClicouEditarProduto(object sender, RoutedEventArgs e)
+
+        // ==========================================
+        // ABA: DESPESAS
+        // ==========================================
+        private void ClicouSalvarDespesa(object sender, RoutedEventArgs e)
         {
-            if ((sender as Button)?.DataContext is Produto p)
+            if (string.IsNullOrWhiteSpace(inputDescricaoDespesa.Text) || !decimal.TryParse(inputValorDespesa.Text, out decimal valor))
             {
-                inputNomeProduto.Text = p.Nome;
-                inputPrecoCusto.Text = p.PrecoCusto.ToString();
-                inputPrecoVenda.Text = p.PrecoVenda.ToString();
-                inputQtdEstoque.Text = p.QuantidadeEstoque.ToString();
-                comboFornecedorProduto.SelectedValue = p.FornecedorId;
-                produtoEmEdicao = p;
+                MessageBox.Show("Preencha a descrição e digite um valor válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-        }
 
-        private void ClicouExcluirProduto(object sender, RoutedEventArgs e)
-        {
-            if ((sender as Button)?.DataContext is Produto p && MessageBox.Show($"Excluir {p.Nome}?", "Confirmar", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            var novaDespesa = new Despesa
             {
-                dbContext.Produtos.Remove(p);
-                dbContext.SaveChanges();
-                AtualizarTelaProdutos();
-            }
+                Descricao = inputDescricaoDespesa.Text,
+                Valor = valor,
+                DataCadastro = DateTime.Now
+            };
+
+            dbContext.Despesas.Add(novaDespesa);
+            dbContext.SaveChanges();
+
+            inputDescricaoDespesa.Clear();
+            inputValorDespesa.Clear();
+            inputDescricaoDespesa.Focus();
+
+            AtualizarTelaDespesas();
+            AtualizarDashboard(); // Atualiza o painel inicial na hora
         }
 
-        private void ClicouLimparProduto(object sender, RoutedEventArgs e)
+        private void AtualizarTelaDespesas()
         {
-            inputNomeProduto.Clear();
-            inputPrecoCusto.Clear();
-            inputPrecoVenda.Clear();
-            inputQtdEstoque.Clear();
-            produtoEmEdicao = null;
-            inputNomeProduto.Focus();
-        }
-
-        private void AtualizarTelaProdutos()
-        {
-            gridProdutos.ItemsSource = null;
-            gridProdutos.Items.Clear();
-            gridProdutos.ItemsSource = dbContext.Produtos.ToList();
-            comboFornecedorProduto.ItemsSource = dbContext.Fornecedores.ToList();
+            gridDespesas.ItemsSource = dbContext.Despesas
+                .OrderByDescending(d => d.DataCadastro)
+                .ToList();
         }
 
         // ==========================================
@@ -555,60 +622,76 @@ namespace SaldanhaMoveisDesktop
 
         private void ClicouFinalizarVenda(object sender, RoutedEventArgs e)
         {
-            if (comboClientesPdv.SelectedItem is not Cliente clienteSelecionado || !carrinhoAtual.Any())
+            if (carrinhoAtual.Count == 0)
             {
-                MessageBox.Show("Selecione o cliente e adicione itens.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("O carrinho de compras está vazio.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (comboClientesPdv.SelectedValue == null)
+            {
+                MessageBox.Show("Selecione um cliente para registrar a venda.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
+                int clienteId = (int)comboClientesPdv.SelectedValue;
+
+                // Recolher com segurança os valores de Desconto e Frete digitados
+                decimal.TryParse(inputDescontoVenda.Text, out decimal desconto);
+                decimal.TryParse(inputFreteVenda.Text, out decimal frete);
+
+                // Recolher a Forma de Pagamento selecionada no ComboBox
+                string formaPagamento = (comboFormaPagamento.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "À Vista";
+
+                // Calcular o valor total considerando os produtos, o desconto e o frete
+                decimal subtotalProdutos = carrinhoAtual.Sum(i => i.Subtotal);
+                decimal valorTotalFinal = (subtotalProdutos - desconto) + frete;
+                if (valorTotalFinal < 0) valorTotalFinal = 0;
+
                 var novaVenda = new Venda
                 {
-                    ClienteId = clienteSelecionado.Id,
+                    ClienteId = clienteId,
                     DataVenda = DateTime.Now,
                     Status = "Concluída",
-                    ValorTotal = carrinhoAtual.Sum(i => i.Subtotal),
-                    Itens = new List<ItemVenda>()
+                    ValorTotal = valorTotalFinal,
+                    FormaPagamento = formaPagamento,
+                    Desconto = desconto,
+                    Frete = frete,
+                    Itens = carrinhoAtual.ToList()
                 };
 
+                // Baixar a quantidade do stock dos produtos vendidos
                 foreach (var item in carrinhoAtual)
                 {
-                    novaVenda.Itens.Add(new ItemVenda { ProdutoId = item.ProdutoId, Quantidade = item.Quantidade, PrecoUnitario = item.PrecoUnitario });
-                    var produtoBanco = dbContext.Produtos.Find(item.ProdutoId);
-                    if (produtoBanco != null) produtoBanco.QuantidadeEstoque -= item.Quantidade;
+                    var produtoDb = dbContext.Produtos.Find(item.ProdutoId);
+                    if (produtoDb != null)
+                    {
+                        produtoDb.QuantidadeEstoque -= item.Quantidade;
+                    }
                 }
-
-                // Gera a receita no Fluxo de Caixa
-                var transacaoAutomatica = new Transacao
-                {
-                    Descricao = $"Venda - Cliente: {clienteSelecionado.Nome}",
-                    Valor = novaVenda.ValorTotal,
-                    Tipo = "Entrada",
-                    Categoria = "Vendas",
-                    Data = DateTime.Now
-                };
-                dbContext.Transacoes.Add(transacaoAutomatica);
 
                 dbContext.Vendas.Add(novaVenda);
                 dbContext.SaveChanges();
-                MessageBox.Show("Venda finalizada e lançada no caixa!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
 
+                MessageBox.Show("Venda finalizada com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // Limpar o carrinho e reiniciar os campos
                 carrinhoAtual.Clear();
-                AtualizarGridCarrinho();
-                AtualizarTelaProdutos();
-                AtualizarCombosPDV();
+                gridCarrinho.ItemsSource = null;
+                inputDescontoVenda.Text = "0";
+                inputFreteVenda.Text = "0";
+                txtTotalVenda.Text = "R$ 0,00";
+
                 AtualizarDashboard();
-                comboClientesPdv.SelectedItem = null;
+                AtualizarTelaProdutos();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro: {ex.Message}");
+                string erroDetalhado = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                MessageBox.Show($"Erro ao salvar a venda: {erroDetalhado}", "Erro de Base de Dados", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            decimal desconto = decimal.TryParse(inputDescontoVenda.Text, out decimal desc) ? desc : 0;
-            decimal frete = decimal.TryParse(inputFreteVenda.Text, out decimal fret) ? fret : 0;
-            string formaPgto = (comboFormaPagamento.SelectedItem as ComboBoxItem)?.Content.ToString();
-
         }
     }
 }

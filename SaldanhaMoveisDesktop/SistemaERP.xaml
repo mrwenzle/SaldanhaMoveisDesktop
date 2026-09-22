@@ -4,6 +4,86 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         Title="Saldanha Móveis - ERP Completo" Height="768" Width="1024" WindowStartupLocation="CenterScreen" Background="#0f0f0f">
 
+    <!-- ESTILOS GLOBAIS PARA DARK MODE COMPLETO -->
+    <Window.Resources>
+        <!-- Estilo para os cabeçalhos das tabelas (DataGrid) -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        </Style>
+
+        <!-- Estilo para as abas superiores (TabItem) -->
+        <Style TargetType="TabItem">
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Border" 
+                        Background="#222222" 
+                        CornerRadius="8,8,0,0" 
+                        Padding="{TemplateBinding Padding}" 
+                        Margin="{TemplateBinding Margin}">
+                            <ContentPresenter x:Name="ContentSite"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      ContentSource="Header"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Efeito ao passar o rato -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#333333"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                            <!-- Aba Selecionada (Dourado com texto preto) -->
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#D4AF37"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- NOVO: Estilo para todos os ComboBoxes (Campos de Seleção) -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#222222"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- NOVO: Estilo para a lista suspensa de opções (ComboBoxItem) -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#222222"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Style.Triggers>
+                <!-- Ao passar o mouse ou selecionar uma opção, destaca em Dourado -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D4AF37"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D4AF37"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
@@ -16,13 +96,13 @@
             <TextBlock Text="ONDE O SUCESSO ACONTECE" Foreground="#888" FontSize="14" HorizontalAlignment="Center" Margin="0,5,0,0"/>
         </StackPanel>
 
-        <!-- ABAS DO SISTEMA (Background escuro para evitar bordas cinzas) -->
+        <!-- ABAS DO SISTEMA -->
         <TabControl Grid.Row="1" Background="#141414" BorderThickness="0" Padding="0">
 
             <!-- ========================================== -->
             <!-- ABA 1: DASHBOARD GERENCIAL                 -->
             <!-- ========================================== -->
-            <TabItem Header="Dashboard">
+            <TabItem Header="📊 Dashboard">
                 <Grid Margin="20" Background="#141414">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -58,7 +138,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- NOVO CARD: DESPESAS DE HOJE -->
                         <Border Background="#222" CornerRadius="8" Padding="20" Margin="10" Width="180" BorderBrush="#ff4444" BorderThickness="1">
                             <StackPanel>
                                 <TextBlock Text="Despesas de Hoje" Foreground="#ccc" FontSize="14"/>
@@ -73,7 +152,6 @@
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Gráfico de Entradas -->
                         <Border Grid.Column="0" Background="#222" CornerRadius="8" Padding="15" Margin="10,0,10,10">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -85,7 +163,6 @@
                             </Grid>
                         </Border>
 
-                        <!-- Gráfico Receitas x Despesas -->
                         <Border Grid.Column="1" Background="#222" CornerRadius="8" Padding="15" Margin="10,0,10,10">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -103,7 +180,7 @@
             <!-- ========================================== -->
             <!-- ABA 2: PAGAMENTO DE FUNCIONÁRIOS           -->
             <!-- ========================================== -->
-            <TabItem Header="Pagamento de Funcionários">
+            <TabItem Header="💼 Pagamento de Funcionários">
                 <Grid Margin="20" Background="#141414">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -145,7 +222,6 @@
                             <DataGridTextColumn Header="Cargo" Binding="{Binding Cargo}" Width="1.5*"/>
                             <DataGridTextColumn Header="Ref." Binding="{Binding MesReferencia}" Width="1*"/>
                             <DataGridTextColumn Header="Valor Pago" Binding="{Binding Valor, StringFormat=C2}" Width="1.5*"/>
-
                             <DataGridTemplateColumn Header="Ações" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -172,7 +248,7 @@
             <!-- ========================================== -->
             <!-- ABA 3: CLIENTES                            -->
             <!-- ========================================== -->
-            <TabItem Header="Clientes">
+            <TabItem Header="👥 Clientes">
                 <Grid Margin="20" Background="#141414">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -235,7 +311,7 @@
             <!-- ========================================== -->
             <!-- ABA 4: FORNECEDORES                        -->
             <!-- ========================================== -->
-            <TabItem Header="Fornecedores">
+            <TabItem Header="🏭 Fornecedores">
                 <Grid Margin="20" Background="#141414">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -244,10 +320,8 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- TÍTULO -->
                     <TextBlock Grid.Row="0" Text="Gestão de Fornecedores" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
-                    <!-- FORMULÁRIO -->
                     <Grid Grid.Row="1" Margin="0,0,0,15">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
@@ -268,13 +342,11 @@
                         <TextBox x:Name="inputTelefoneFornecedor" Grid.Row="1" Grid.Column="2" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center"/>
                     </Grid>
 
-                    <!-- BOTÕES DE AÇÃO -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
                         <Button Content="LIMPAR" Click="ClicouLimparFornecedor" Background="Transparent" Foreground="#888" BorderThickness="0" Margin="0,0,15,0" Cursor="Hand"/>
                         <Button Content="SALVAR FORNECEDOR" Click="ClicouSalvarFornecedor" Background="#D4AF37" Foreground="Black" FontWeight="Bold" Padding="15,8" Cursor="Hand"/>
                     </StackPanel>
 
-                    <!-- TABELA DE FORNECEDORES -->
                     <DataGrid x:Name="gridFornecedores" Grid.Row="3" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Empresa / Nome Fantasia" Binding="{Binding NomeFantasia}" Width="2*"/>
@@ -298,7 +370,7 @@
             <!-- ========================================== -->
             <!-- ABA 5: PRODUTOS                            -->
             <!-- ========================================== -->
-            <TabItem Header="Produtos">
+            <TabItem Header="📦 Produtos">
                 <Grid Margin="20" Background="#141414">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -330,7 +402,6 @@
 
                         <TextBox x:Name="inputNomeProduto" Grid.Row="1" Grid.Column="0" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
 
-                        <!-- ComboBox de Fornecedor Editável -->
                         <ComboBox x:Name="comboFornecedorProduto" Grid.Row="1" Grid.Column="1" 
                                   DisplayMemberPath="NomeFantasia" SelectedValuePath="Id" 
                                   IsEditable="True" IsTextSearchEnabled="True" StaysOpenOnEdit="True"
@@ -371,7 +442,7 @@
             <!-- ========================================== -->
             <!-- ABA 6: DESPESAS                            -->
             <!-- ========================================== -->
-            <TabItem Header="Despesas">
+            <TabItem Header="💸 Despesas">
                 <Grid Margin="20" Background="#141414">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -381,10 +452,9 @@
 
                     <TextBlock Grid.Row="0" Text="Despesas Diárias" Foreground="#D4AF37" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
-                    <!-- FORMULÁRIO -->
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
                         <StackPanel Margin="0,0,15,0" Width="300">
-                            <TextBlock Text="Descrição (ex: gasolina fiorino, café):" Foreground="#ccc" FontSize="12"/>
+                            <TextBlock Text="Descrição (ex: gasolina, café):" Foreground="#ccc" FontSize="12"/>
                             <TextBox x:Name="inputDescricaoDespesa" Height="30" Background="#222" Foreground="White" VerticalContentAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Margin="0,0,15,0" Width="120">
@@ -394,7 +464,6 @@
                         <Button Content="LANÇAR DESPESA" Click="ClicouSalvarDespesa" Background="#ff4444" Foreground="White" FontWeight="Bold" Height="30" Padding="15,0" VerticalAlignment="Bottom" Cursor="Hand"/>
                     </StackPanel>
 
-                    <!-- TABELA DE DESPESAS -->
                     <DataGrid x:Name="gridDespesas" Grid.Row="2" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" RowBackground="#222" AlternatingRowBackground="#1a1a1a" IsReadOnly="True" BorderBrush="#333" HeadersVisibility="Column" GridLinesVisibility="None">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Data" Binding="{Binding DataCadastro, StringFormat=dd/MM/yyyy HH:mm}" Width="1.5*"/>
@@ -408,7 +477,7 @@
             <!-- ========================================== -->
             <!-- ABA 7: PONTO DE VENDA (PDV)                -->
             <!-- ========================================== -->
-            <TabItem Header="Ponto de Venda">
+            <TabItem Header="🛒 Ponto de Venda">
                 <Grid Margin="20" Background="#141414">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
@@ -440,7 +509,7 @@
 
                         <TextBlock Grid.Row="0" Text="Carrinho de Compras" Foreground="White" FontSize="18" FontWeight="Bold" Margin="15"/>
 
-                        <DataGrid x:Name="gridCarrinho" Grid.Row="1" AutoGenerateColumns="False" Background="Transparent" Foreground="White" BorderBrush="Transparent" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" Margin="15,0">
+                        <DataGrid x:Name="gridCarrinho" Grid.Row="1" AutoGenerateColumns="False" Background="#1a1a1a" Foreground="White" BorderBrush="#333" RowBackground="#222" AlternatingRowBackground="#1a1a1a" HeadersVisibility="Column" GridLinesVisibility="None" IsReadOnly="True" Margin="15,0">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Produto" Binding="{Binding Produto.Nome}" Width="2*"/>
                                 <DataGridTextColumn Header="Qtd" Binding="{Binding Quantidade}" Width="0.8*"/>
@@ -455,7 +524,6 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <!-- OPÇÕES DE PAGAMENTO, DESCONTO E FRETE -->
                         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="15,15,15,10">
                             <StackPanel Margin="0,0,15,0">
                                 <TextBlock Text="Forma de Pagamento:" Foreground="#ccc" FontSize="12"/>
@@ -477,13 +545,16 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="3" Background="#222" Padding="15">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
-                                <TextBlock Text="Total:" Foreground="#ccc" FontSize="18" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="txtTotalVenda" Text="R$ 0,00" Foreground="#00ff00" FontSize="28" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                        <!-- A correção do Padding no Border foi mantida aqui -->
+                        <Border Grid.Row="3" Background="#222" Padding="15">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
+                                    <TextBlock Text="Total:" Foreground="#ccc" FontSize="18" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalVenda" Text="R$ 0,00" Foreground="#00ff00" FontSize="28" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Button Content="FINALIZAR VENDA" Click="ClicouFinalizarVenda" Background="#00ff00" Foreground="Black" FontWeight="Bold" FontSize="16" Height="45" Cursor="Hand"/>
                             </StackPanel>
-                            <Button Content="FINALIZAR VENDA" Click="ClicouFinalizarVenda" Background="#00ff00" Foreground="Black" FontWeight="Bold" FontSize="16" Height="45" Cursor="Hand"/>
-                        </StackPanel>
+                        </Border>
                     </Grid>
                 </Grid>
             </TabItem>
