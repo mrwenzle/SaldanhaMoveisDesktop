@@ -14,6 +14,9 @@ namespace SaldanhaMoveisDesktop
         public DateTime DataVenda { get; set; }
         public string Status { get; set; }
 
+        public string FormaPagamento { get; set; }
+        public decimal Desconto { get; set; }
+        public decimal Frete { get; set; }
         public List<ItemVenda> Itens { get; set; } = new List<ItemVenda>();
     }
 }

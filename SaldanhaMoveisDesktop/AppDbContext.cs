@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SaldanhaMoveisDesktop.Models;
 
 namespace SaldanhaMoveisDesktop
 {
@@ -12,6 +13,7 @@ namespace SaldanhaMoveisDesktop
         public DbSet<ItemVenda> ItensVenda { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
         public DbSet<PagamentoFuncionario> Pagamentos { get; set; }
+        public DbSet<Despesa> Despesas { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

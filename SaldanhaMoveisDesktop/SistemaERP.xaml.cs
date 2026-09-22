@@ -7,6 +7,7 @@ using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
 using LiveCharts;
 using LiveCharts.Wpf;
+using SaldanhaMoveisDesktop.Models;
 
 namespace SaldanhaMoveisDesktop
 {
@@ -34,6 +35,7 @@ namespace SaldanhaMoveisDesktop
             AtualizarTelaProdutos();
             AtualizarTelaFornecedores();
             AtualizarCombosPDV();
+            AtualizarTelaDespesas();
         }
 
         // ==========================================
@@ -94,6 +96,15 @@ namespace SaldanhaMoveisDesktop
                 new PieSeries { Title = "Receitas", Values = new ChartValues<decimal> { receitasMes }, Fill = Brushes.MediumSeaGreen, DataLabels = true },
                 new PieSeries { Title = "Despesas", Values = new ChartValues<decimal> { despesasMes }, Fill = Brushes.IndianRed, DataLabels = true }
             };
+            // Calcula Despesas de Hoje
+            var inicioDoDia = DateTime.Today;
+            var fimDoDia = DateTime.Today.AddDays(1).AddTicks(-1);
+
+            var despesasHoje = dbContext.Despesas
+                .Where(d => d.DataCadastro >= inicioDoDia && d.DataCadastro <= fimDoDia)
+                .Sum(d => d.Valor);
+
+            txtDespesasHoje.Text = despesasHoje.ToString("C2");
         }
 
         private void ClicouVerMovimentacoes(object sender, RoutedEventArgs e)
@@ -388,6 +399,41 @@ namespace SaldanhaMoveisDesktop
             }
         }
 
+        // ==========================================
+        // ABA: DESPESAS
+        // ==========================================
+        private void ClicouSalvarDespesa(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(inputDescricaoDespesa.Text) || !decimal.TryParse(inputValorDespesa.Text, out decimal valor))
+            {
+                MessageBox.Show("Preencha a descrição e digite um valor válido.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var novaDespesa = new Despesa
+            {
+                Descricao = inputDescricaoDespesa.Text,
+                Valor = valor,
+                DataCadastro = DateTime.Now
+            };
+
+            dbContext.Despesas.Add(novaDespesa);
+            dbContext.SaveChanges();
+
+            inputDescricaoDespesa.Clear();
+            inputValorDespesa.Clear();
+            inputDescricaoDespesa.Focus();
+
+            AtualizarTelaDespesas();
+            AtualizarDashboard(); // Atualiza o painel inicial na hora
+        }
+
+        private void AtualizarTelaDespesas()
+        {
+            gridDespesas.ItemsSource = dbContext.Despesas
+                .OrderByDescending(d => d.DataCadastro)
+                .ToList();
+        }
         private void ClicouEditarFornecedor(object sender, RoutedEventArgs e)
         {
             if ((sender as Button)?.DataContext is Fornecedor f)
@@ -559,6 +605,10 @@ namespace SaldanhaMoveisDesktop
             {
                 MessageBox.Show($"Erro: {ex.Message}");
             }
+            decimal desconto = decimal.TryParse(inputDescontoVenda.Text, out decimal desc) ? desc : 0;
+            decimal frete = decimal.TryParse(inputFreteVenda.Text, out decimal fret) ? fret : 0;
+            string formaPgto = (comboFormaPagamento.SelectedItem as ComboBoxItem)?.Content.ToString();
+
         }
     }
 }
